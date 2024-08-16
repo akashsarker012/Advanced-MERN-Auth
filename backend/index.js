@@ -1,8 +1,11 @@
 const { PrismaClient } = require('@prisma/client');
 const express = require('express');
 const { connectDatabase } = require('./database/connectDb');
+require('dotenv').config();
 const apiRoutes = require('./routes/index');
 const prisma = new PrismaClient();
+
+
 
 const app = express();
 const port = 5000;
