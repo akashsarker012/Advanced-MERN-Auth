@@ -10,5 +10,17 @@ generator client {
 model User {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   email String @unique
+  password String
+  name String
+  isVerified Boolean @default(false)
+  lastLoginAt DateTime
+  resetPasswordToken String
+  resetPasswordExpires DateTime
+  verificationToken String
+  verificationExpires DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
 }
 
