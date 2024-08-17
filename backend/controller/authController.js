@@ -2,6 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { TokenAndSetCookie } = require("../utils/TokenAndSetCookie");
+const { sendVerificationEmail } = require("../mailtrap/email");
 const prisma = new PrismaClient();
 const singUp = async (req, res) => {
   try {
@@ -28,11 +29,12 @@ const singUp = async (req, res) => {
       password: hashedPassword,
       verificationToken,
       isVerified: false,
-      lastLoginAt: new Date(), // Convert to Date object
+      lastLoginAt: new Date(), 
       verificationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
     };
 
     const user = await prisma.user.create({ data: userData });
+    sendVerificationEmail(user.email, verificationToken);
     TokenAndSetCookie(res, user.id);
 
     res.status(200).json({
