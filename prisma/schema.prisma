@@ -25,11 +25,15 @@ generator client {
 
 model User {
   id                  String   @id @default(auto()) @map("_id") @db.ObjectId
-  name                String // The name field
-  email               String   @unique // The email field with a unique constraint
-  password            String // The password field
-  verificationToken   String? // Optional verification token field
-  verificationExpires Int // Verification expiry field
+  name                String 
+  email               String   @unique 
+  password            String 
+  verificationToken   String? 
+  verificationExpires DateTime
+  isVerified Boolean @default(false)
+  lastLoginAt DateTime
+  // resetPasswordToken String
+  // resetPasswordExpires DateTime
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
