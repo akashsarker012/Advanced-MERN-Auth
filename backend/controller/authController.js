@@ -2,7 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { TokenAndSetCookie } = require("../utils/TokenAndSetCookie");
-const { sendVerificationEmail } = require("../mailtrap/email");
+const { sendVerificationEmail, sendWelcomeEmail } = require("../mailtrap/email");
 const prisma = new PrismaClient();
 const singUp = async (req, res) => {
   try {
@@ -29,7 +29,7 @@ const singUp = async (req, res) => {
       password: hashedPassword,
       verificationToken,
       isVerified: false,
-      lastLoginAt: new Date(), 
+      lastLoginAt: new Date(),
       verificationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
     };
 
@@ -50,4 +50,42 @@ const singUp = async (req, res) => {
   }
 };
 
-module.exports = { singUp };
+const verifyEmail = async (req, res) => {
+  try {
+    // Find user with the provided token and ensure the token is still valid
+    const user = await prisma.user.findFirst({
+      where: {
+        verificationToken: req.body.verificationToken,
+        verificationExpires: { gte: new Date() },
+      },
+    });
+
+    // If no user is found, return an error
+    if (!user) {
+      return res.status(400).json({ success: false, message: "Invalid or expired verification token" });
+    }
+
+    // Update the user's verification status
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        isVerified: true,
+        verificationToken: '', // Set to empty string
+        verificationExpires: null, // Set to null
+      },
+    });
+
+    // Respond with success
+    await sendWelcomeEmail(user.email, user.name);
+    res.status(200).json({ success: true, message: "Email verified successfully" });
+  } catch (error) {
+    // Handle any errors
+    console.error(error); // Log the error for debugging
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+
+
+module.exports = { singUp , verifyEmail };

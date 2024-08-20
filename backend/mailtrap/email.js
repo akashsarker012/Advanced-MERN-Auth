@@ -17,4 +17,21 @@ const sendVerificationEmail = async (email, verificationToken) => {
   }
 };
 
-module.exports = { sendVerificationEmail };
+const sendWelcomeEmail = async (email, name) => {
+  const mailOptions = {
+    from: sender.email, // Sender address
+    to: email,          // Recipient's email
+    subject: "Welcome to My App",
+    html: `Welcome ${name}!`, // HTML template
+  };
+
+  try {
+    const response = await mailClient.sendMail(mailOptions);
+    console.log("Email sent: ", response);
+  } catch (error) {
+    console.log("Error sending email: ", error.message);
+  }
+};
+
+
+module.exports = { sendVerificationEmail, sendWelcomeEmail };
