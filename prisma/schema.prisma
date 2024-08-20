@@ -23,20 +23,6 @@ generator client {
 
 // }
 
-// model User {
-//   id                  String   @id @default(auto()) @map("_id") @db.ObjectId
-//   name                String 
-//   email               String   @unique 
-//   password            String 
-//   verificationToken   String
-//   verificationExpires DateTime
-//   isVerified Boolean @default(false)
-//   lastLoginAt DateTime
-//   // resetPasswordToken String
-//   // resetPasswordExpires DateTime
-//   createdAt           DateTime @default(now())
-//   updatedAt           DateTime @updatedAt
-// }
 model User {
   id                  String   @id @default(auto()) @map("_id") @db.ObjectId
   name                String 

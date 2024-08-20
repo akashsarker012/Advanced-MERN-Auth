@@ -52,7 +52,6 @@ const singUp = async (req, res) => {
 
 const verifyEmail = async (req, res) => {
   try {
-    // Find user with the provided token and ensure the token is still valid
     const user = await prisma.user.findFirst({
       where: {
         verificationToken: req.body.verificationToken,
@@ -86,6 +85,45 @@ const verifyEmail = async (req, res) => {
 };
 
 
+const singIn = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Invalid email or password" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: "Invalid email or password" });
+    }
+
+    TokenAndSetCookie(res, user.id);
+    user.lastLoginAt = new Date();
 
 
-module.exports = { singUp , verifyEmail };
+    res.status(200).json({ success: true, message: "Logged in successfully", user: {
+      ...user,
+      password: undefined,
+    } });
+    
+  } catch (error) {
+    console.log(error);
+    
+    res.status(500).json({ success: false, message: error.message });
+    
+  }
+
+}
+
+const logout = async (req, res) => {
+  try {
+    res.clearCookie("token");
+    res.status(200).json({ success: true, message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+module.exports = { singUp , verifyEmail , singIn , logout };
