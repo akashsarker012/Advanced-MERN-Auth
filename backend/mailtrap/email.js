@@ -1,4 +1,4 @@
-const { VERIFICATION_EMAIL_TEMPLATE } = require("./emailTemplete");
+const { VERIFICATION_EMAIL_TEMPLATE, PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE } = require("./emailTemplete");
 const { mailClient, sender } = require("./mailtrap.config");
 
 const sendVerificationEmail = async (email, verificationToken) => {
@@ -33,5 +33,47 @@ const sendWelcomeEmail = async (email, name) => {
   }
 };
 
+const sendResetPasswordEmail = async (email, resetToken) => {
 
-module.exports = { sendVerificationEmail, sendWelcomeEmail };
+  try {
+
+    const mailOptions = {
+      from: sender.email,
+      to: email,          
+      subject: "Reset Password",
+      html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetToken}", resetToken),
+    };
+
+    try {
+      const response = await mailClient.sendMail(mailOptions);
+      console.log("Email sent: ", response);
+    } catch (error) {
+      console.log("Error sending email: ", error.message);
+    }
+    
+  } catch (error) {
+    console.log("Error sending email: ", error.message);
+    
+  }
+
+
+}
+
+const sendResetSuccessEmail = async (email) => {
+  const mailOptions = {
+    from: sender.email,
+    to: email,
+    subject: "Password Reset Successful",
+    html: PASSWORD_RESET_SUCCESS_TEMPLATE,
+  };
+
+  try {
+    const response = await mailClient.sendMail(mailOptions);
+    console.log("Email sent: ", response);
+  } catch (error) {
+    console.log("Error sending email: ", error.message);
+  }
+  };
+
+
+module.exports = { sendVerificationEmail, sendWelcomeEmail , sendResetPasswordEmail, sendResetSuccessEmail };
