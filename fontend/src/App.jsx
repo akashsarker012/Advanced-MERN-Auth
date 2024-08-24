@@ -7,6 +7,7 @@ import { Route, Routes } from "react-router-dom";
 import Home from './pages/Home';
 import SingUp from "./pages/SingUp";
 import SingIn from "./pages/SingIn";
+import VerifyEmail from "./pages/verifyEmail";
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
         <Route path="/" element={<Home/>} />
         <Route path="sing-up" element={<SingUp/>} />
         <Route path="sing-in" element={<SingIn/>} />
+        <Route path="verify-email" element={<VerifyEmail/>} />
       </Routes>
     
     </div>
