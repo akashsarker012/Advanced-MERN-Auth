@@ -11,7 +11,7 @@ const sendVerificationEmail = async (email, verificationToken) => {
 
   try {
     const response = await mailClient.sendMail(mailOptions); 
-    console.log("Email sent: ", response);
+    // console.log("Email sent: ", response);
   } catch (error) {
     console.log("Error sending email: ", error.message);
   }

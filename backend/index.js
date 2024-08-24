@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const express = require('express');
+const cors = require('cors');
 const { connectDatabase } = require('./database/connectDb');
 require('dotenv').config();
 const cookieParser = require('cookie-parser')
@@ -9,6 +10,7 @@ const port = 5000;
 connectDatabase()
 
 
+app.use(cors())
 app.use(express.json());
 app.use(cookieParser())
 app.use(apiRoutes)

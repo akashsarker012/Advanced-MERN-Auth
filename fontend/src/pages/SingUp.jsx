@@ -2,14 +2,28 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Loader, Lock, Mail, User } from "lucide-react";
 import Input from "./../components/Input";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
+import { useAuthStore } from "../store/authStore";
 
 function SingUp() {
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [isLoading, setIsLoading] = React.useState(false);
+  const navigate = useNavigate();
+
+  const { singup, error, isLoading } = useAuthStore(); // Access Zustand store
+
+  const handleSingUp = async (e) => {
+    e.preventDefault();
+    try {
+      await singup(email, password, name);
+      navigate("/verify-email");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -22,53 +36,55 @@ function SingUp() {
           Create Account
         </h2>
       
-      <form>
-        <Input
-          icon={User}
-          type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <Input
-          icon={Mail}
-          type="email"
-          placeholder="Email Address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Input
-          icon={Lock}
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <PasswordStrengthMeter password={password} />
+        <form onSubmit={handleSingUp}>
+          <Input
+            icon={User}
+            type="text"
+            placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <Input
+            icon={Mail}
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input
+            icon={Lock}
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {error && <p className='text-red-500 font-semibold mt-2'>{error}</p>}
+          <PasswordStrengthMeter password={password} />
 
-<motion.button
-						className='mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
-						font-bold rounded-lg shadow-lg hover:from-green-600
-						hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
-						 focus:ring-offset-gray-900 transition duration-200'
-						whileHover={{ scale: 1.02 }}
-						whileTap={{ scale: 0.98 }}
-						type='submit'
-						disabled={isLoading}
-					>
-						{isLoading ? <Loader className='animate-spin mx-auto' size={24} /> : "Sign Up"}
-					</motion.button>
-      </form>
+          <motion.button
+            className='mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
+            font-bold rounded-lg shadow-lg hover:from-green-600
+            hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
+            focus:ring-offset-gray-900 transition duration-200'
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type='submit'
+            disabled={isLoading}
+          >
+            {isLoading ? <Loader className='animate-spin mx-auto' size={24} /> : "Sign Up"}
+          </motion.button>
+        </form>
       </div>
       <div className='px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center'>
-				<p className='text-sm text-gray-400'>
-					Already have an account?{" "}
-					<Link to={"/sing-in"} className='text-green-400 hover:underline'>
-						Login
-					</Link>
-				</p>
-			</div>
+        <p className='text-sm text-gray-400'>
+          Already have an account?{" "}
+          <Link to={"/sing-in"} className='text-green-400 hover:underline'>
+            Login
+          </Link>
+        </p>
+      </div>
     </motion.div>
   );
 }
+
 export default SingUp;
