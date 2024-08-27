@@ -6,23 +6,6 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
-
-// model User {
-//   id    String @id @default(auto()) @map("_id") @db.ObjectId
-//   email String @unique
-//   password String
-//   name String
-//   isVerified Boolean @default(false)
-//   lastLoginAt DateTime
-//   resetPasswordToken String
-//   resetPasswordExpires DateTime
-//   verificationToken String
-//   verificationExpires DateTime
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-
-// }
-
 model User {
   id                   String    @id @default(auto()) @map("_id") @db.ObjectId
   name                 String
@@ -36,4 +19,17 @@ model User {
   lastLoginAt          DateTime
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
+  loginHistory         LoginHistory[]
+}
+model LoginHistory {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  userAgent  String
+  ip         String
+  time       DateTime @default(now())
+  token      String   @unique
+  deviceInfo Json     @default("{}")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user   User   @relation(fields: [userId], references: [id])
 }

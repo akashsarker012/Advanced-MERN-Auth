@@ -6,6 +6,7 @@ const { TokenAndSetCookie } = require("../utils/TokenAndSetCookie");
 const { sendVerificationEmail, sendWelcomeEmail, sendResetPasswordEmail, sendResetSuccessEmail } = require("../mailtrap/email");
 const prisma = new PrismaClient();
 const singUp = async (req, res) => {
+
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -31,8 +32,9 @@ const singUp = async (req, res) => {
       verificationToken,
       isVerified: false,
       lastLoginAt: new Date(),
-      verificationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
+      verificationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000), 
     };
+
 
     const user = await prisma.user.create({ data: userData });
     sendVerificationEmail(user.email, verificationToken);
@@ -47,6 +49,8 @@ const singUp = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log(error);
+    
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -59,23 +63,18 @@ const verifyEmail = async (req, res) => {
         verificationExpires: { gte: new Date() },
       },
     });
-
-    // If no user is found, return an error
     if (!user) {
       return res.status(400).json({ success: false, message: "Invalid or expired verification token" });
     }
-
-    // Update the user's verification status
+   
     await prisma.user.update({
       where: { id: user.id },
       data: {
         isVerified: true,
-        verificationToken: '', // Set to empty string
-        verificationExpires: null, // Set to null
+        verificationToken: '', 
+        verificationExpires: null, 
       },
     });
-
-    // Respond with success
     await sendWelcomeEmail(user.email, user.name);
     res.status(200).json({ success: true, message: "Email verified successfully" });
   } catch (error) {
@@ -85,6 +84,8 @@ const verifyEmail = async (req, res) => {
   }
 };
 const singIn = async (req, res) => {
+  const deviceInfo = req.deviceInfo;
+  const ip = req.clientIp;
   try {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
@@ -96,11 +97,21 @@ const singIn = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ success: false, message: "Invalid email or password" });
     }
+    const uniqueToken = Date.now().toString();
+    
+    await prisma.loginHistory.create({
+      data: {
+        userId: user.id,
+        ip: ip,
+        userAgent: uniqueToken,
+        token: uniqueToken,
+        deviceInfo: deviceInfo
+      },
+    });
 
     TokenAndSetCookie(res, user.id);
     user.lastLoginAt = new Date();
-
-
+    
     res.status(200).json({ success: true, message: "Logged in successfully", user: {
       ...user,
       password: undefined,
