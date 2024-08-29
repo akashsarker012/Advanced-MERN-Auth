@@ -11,13 +11,13 @@ const app = express();
 const port = 5000;
 connectDatabase()
 
+app.use(express.json());
 app.use(body_parser.json())
 app.use(requestIp.mw())
 app.use(cors({
     origin: process.env.FRONTEND_URL,
     credentials: true
   }))
-app.use(express.json());
 app.use(cookieParser())
 app.use(apiRoutes)
 app.listen(port, () => {

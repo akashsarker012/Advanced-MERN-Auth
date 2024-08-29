@@ -14,13 +14,13 @@ const singUp = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+      return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
 
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({success: false, message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -45,7 +45,7 @@ const singUp = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "User created successfully",
+      message: "User created successfully Please verify your email",
       user: {
         ...user,
         password: undefined,
@@ -60,39 +60,55 @@ const singUp = async (req, res) => {
 
 const verifyEmail = async (req, res) => {
   try {
-    const user = await prisma.user.findFirst({
-      where: {
-        verificationToken: req.body.verificationToken,
-        verificationExpires: { gte: new Date() },
-      },
-    });
-    if (!user) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Invalid or expired verification token",
-        });
+    const decode = jwt.verify(req.cookies.token, process.env.JWT_SECRET)
+
+    const userId = decode.userId
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "No user ID found in cookies",
+      });
     }
 
+    const { verificationToken } = req.body;
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (user.verificationToken !== verificationToken) {
+      return res.status(400).send({
+        success: false,
+        message: "Invalid verification code",
+      });
+    }
     await prisma.user.update({
       where: { id: user.id },
       data: {
         isVerified: true,
-        verificationToken: "",
-        verificationExpires: null,
+        verificationToken: "", 
+        verificationExpires: null, 
       },
     });
-    await sendWelcomeEmail(user.email, user.name);
-    res
-      .status(200)
-      .json({ success: true, message: "Email verified successfully" });
+    res.clearCookie('token');
+
+    res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+    });
   } catch (error) {
-    // Handle any errors
-    console.error(error); // Log the error for debugging
+    console.error("Verification error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+
 const singIn = async (req, res) => {
   const deviceInfo = req.deviceInfo;
   const ip = req.clientIp;
