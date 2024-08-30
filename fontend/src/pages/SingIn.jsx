@@ -4,6 +4,7 @@ import { Mail, Lock, Loader, EyeOff, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import Input from "../components/Input";
 import axios from "axios";
+import { toast } from 'react-hot-toast';
 
 const SingIn = () => {
   const [email, setEmail] = useState("");
@@ -20,15 +21,26 @@ const SingIn = () => {
 	  }, {
 		headers: {
 		  'Content-Type': 'application/json'
-		}
+		},
+    withCredentials: true 
 	  });
-	      localStorage.setItem("token", response.data.token);
-    localStorage.setItem("user", JSON.stringify(response.data.user));
-  
-	  console.log(response.data);
+    // console.log(response.data);
+    if (response.data.success) {
+      toast.success(response.data.success, {
+        position: "top-center",
+      })
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+    }
+    else if (response.data.error) {
+      toast.error(response.data.error, {
+        position: "top-center",
+      })
+    }
 	} catch (error) {
-	  console.error('Error:', error.response ? error.response.data : error.message);
-	}
+    console.log(error)
+  }
   };
   
   return (

@@ -12,13 +12,13 @@ const port = 5000;
 connectDatabase()
 
 app.use(express.json());
-app.use(body_parser.json())
 app.use(requestIp.mw())
+app.use(cookieParser())
+app.use(body_parser.json())
 app.use(cors({
     origin: process.env.FRONTEND_URL,
     credentials: true
   }))
-app.use(cookieParser())
 app.use(apiRoutes)
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

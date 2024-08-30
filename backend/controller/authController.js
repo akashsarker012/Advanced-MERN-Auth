@@ -2,13 +2,14 @@ const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const { TokenAndSetCookie } = require("../utils/TokenAndSetCookie");
+const { TokenAndSetCookie, loginToken } = require("../utils/TokenAndSetCookie");
 const {
   sendVerificationEmail,
   sendWelcomeEmail,
   sendResetPasswordEmail,
   sendResetSuccessEmail,
 } = require("../mailtrap/email");
+const { error } = require("console");
 const prisma = new PrismaClient();
 const singUp = async (req, res) => {
   try {
@@ -116,18 +117,14 @@ const singIn = async (req, res) => {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return res
-        .status(401)
-        .json({ success: false, message: "user not found" });
+      return res.json({ error: "user not found" });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res
-        .status(401)
-        .json({ success: false, message: "password not match" });
+      return res.json({ error: 'Incorrect password' });
     }
     if(user.isVerified === false){
-      return res.status(401).json({ success: false, message: "Please verify you email" });
+      return res.json({ error: "Please verify you email" });
     }
     const uniqueToken = Date.now().toString();
 
@@ -141,20 +138,12 @@ const singIn = async (req, res) => {
       },
     });
 
-    TokenAndSetCookie(res, user.id);
+    loginToken(res, user.id);
     user.lastLoginAt = new Date();
 
-    res.status(200).json({
-      success: true,
-      message: "Logged in successfully",
-      user: {
-        ...user,
-        password: undefined,
-      },
-    });
+    res.json({ success: "Logged in successfully",});
   } catch (error) {
     console.log(error);
-
     res.status(500).json({ success: false, message: error.message });
   }
 };

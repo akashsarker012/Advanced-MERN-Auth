@@ -6,9 +6,22 @@ const TokenAndSetCookie = (res, userId) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   return token;
 };
 
-module.exports = { TokenAndSetCookie };
+const loginToken = (res, userId) => {
+
+  const token = jwt.sign({ userId }, process.env.JWT_SECRET);
+  res.cookie('user', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+  return token;
+  
+};
+
+module.exports = { TokenAndSetCookie , loginToken };
