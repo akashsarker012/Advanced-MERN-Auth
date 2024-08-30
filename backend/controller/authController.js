@@ -162,9 +162,7 @@ const forgotPassword = async (req, res) => {
     const { email } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      return res.json({error: "User not found" });
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex");
@@ -183,9 +181,7 @@ const forgotPassword = async (req, res) => {
       user.email,
       `${process.env.FRONTEND_URL}/reset-password/${resetToken}`
     );
-    res
-      .status(200)
-      .json({ success: true, message: "Reset password email sent" });
+    res.json({ success: "email sent successfully please check your email" });
   } catch (error) {
     console.log(error);
 

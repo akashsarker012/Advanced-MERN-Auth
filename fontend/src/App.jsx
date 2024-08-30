@@ -10,6 +10,7 @@ import SingIn from "./pages/SingIn";
 import VerifyEmail from "./pages/verifyEmail";
 import { Toaster } from "react-hot-toast";
 import PrivateRoute from "./pages/PrivateRoute";
+import ForgotPassword from "./pages/ForgotPassword";
 
 function App() {
 
@@ -62,6 +63,7 @@ function App() {
         </PrivateRoute>
         } />
         <Route path="verify-email" element={<VerifyEmail/>} />
+        <Route path="forgot-password" element={<ForgotPassword/>} />
       </Routes>
     
     </div>
