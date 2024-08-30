@@ -1,9 +1,24 @@
-import React from 'react'
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
-function PrivateRoute() {
-  return (
-    <div>PrivateRoute</div>
-  )
-}
+const PrivateRoute = ({ children }) => {
+  const path = window.location.pathname;
 
-export default PrivateRoute
+  const publicPaths = ['/sing-up', '/sing-in', '/verify-email'];
+  const isPublicPath = publicPaths.includes(path);
+  
+  const user = Cookies.get('user');
+
+  if (isPublicPath && user) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (!isPublicPath && !user) {
+    return <Navigate to="/sing-in" replace />;
+  }
+
+  return children;
+};
+
+export default PrivateRoute;

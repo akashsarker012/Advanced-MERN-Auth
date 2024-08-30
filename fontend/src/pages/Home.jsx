@@ -1,7 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react';
+import Cookies from 'js-cookie';
 
-export default function Home() {
+function Home() {
+  useEffect(() => {
+    const token = Cookies.get('user');
+    console.log('Token:', token);
+  }, []);
+
   return (
-    <div>Home</div>
-  )
+    <div>
+      <p>Current Token: {Cookies.get('user')}</p>
+    </div>
+  );
 }
+
+export default Home;

@@ -15,11 +15,12 @@ const loginToken = (res, userId) => {
 
   const token = jwt.sign({ userId }, process.env.JWT_SECRET);
   res.cookie('user', token, {
-    httpOnly: true,
+    httpOnly: false, 
     secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    sameSite: 'Lax', 
+    path: '/',
   });
+  
   return token;
   
 };

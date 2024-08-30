@@ -7,6 +7,9 @@ const router = express.Router();
 
 router.get('/check-auth', verifyToken , checkAuth);
 router.post('/singup', singUp);
+// router.get('/get-cookies', (req, res) => {
+//     res.send(req.cookies);
+// });
 router.post('/verify-email', verifyEmail);
 router.post('/singin',deviceInformation, singIn);
 router.post('/forgot-password', forgotPassword);

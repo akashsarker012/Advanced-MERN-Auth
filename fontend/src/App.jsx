@@ -9,6 +9,7 @@ import SingUp from "./pages/SingUp";
 import SingIn from "./pages/SingIn";
 import VerifyEmail from "./pages/verifyEmail";
 import { Toaster } from "react-hot-toast";
+import PrivateRoute from "./pages/PrivateRoute";
 
 function App() {
 
@@ -45,9 +46,21 @@ function App() {
 			<FloatingShape color='bg-lime-500' size='w-32 h-32' top='40%' left='-10%' delay={2} />
       <Routes>
         
-        <Route path="/" element={<Home/>} />
-        <Route path="sing-up" element={<SingUp/>} />
-        <Route path="sing-in" element={<SingIn/>} />
+        <Route path="/" element={
+           <PrivateRoute>
+           <Home />
+         </PrivateRoute>
+        } />
+        <Route path="sing-up" element={
+            <PrivateRoute>
+            <SingUp/>
+          </PrivateRoute>
+          } />
+        <Route path="sing-in" element={
+          <PrivateRoute>
+          <SingIn/>
+        </PrivateRoute>
+        } />
         <Route path="verify-email" element={<VerifyEmail/>} />
       </Routes>
     
