@@ -11,6 +11,7 @@ import VerifyEmail from "./pages/verifyEmail";
 import { Toaster } from "react-hot-toast";
 import PrivateRoute from "./pages/PrivateRoute";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
 
@@ -52,18 +53,20 @@ function App() {
            <Home />
          </PrivateRoute>
         } />
-        <Route path="sing-up" element={
+        <Route path="/sing-up" element={
             <PrivateRoute>
             <SingUp/>
           </PrivateRoute>
+          } />        
+          <Route path="/sing-in" element={
+            <PrivateRoute>
+            <SingIn/>
+          </PrivateRoute>
           } />
-        <Route path="sing-in" element={
-          <PrivateRoute>
-          <SingIn/>
-        </PrivateRoute>
-        } />
-        <Route path="verify-email" element={<VerifyEmail/>} />
-        <Route path="forgot-password" element={<ForgotPassword/>} />
+    <Route path="/reset-password/:token" element={ <ResetPassword/>} />
+        
+        <Route path="/verify-email" element={<VerifyEmail/>} />
+        <Route path="/forgot-password" element={<ForgotPassword/>} />
       </Routes>
     
     </div>

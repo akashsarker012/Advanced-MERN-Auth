@@ -27,7 +27,7 @@ const sendWelcomeEmail = async (email, name) => {
 
   try {
     const response = await mailClient.sendMail(mailOptions);
-    console.log("Email sent: ", response);
+    // console.log("Email sent: ", response);
   } catch (error) {
     console.log("Error sending email: ", error.message);
   }
@@ -46,7 +46,7 @@ const sendResetPasswordEmail = async (email, resetToken) => {
 
     try {
       const response = await mailClient.sendMail(mailOptions);
-      console.log("Email sent: ", response);
+      // console.log("Email sent: ", response);
     } catch (error) {
       console.log("Error sending email: ", error.message);
     }

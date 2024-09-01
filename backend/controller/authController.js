@@ -9,7 +9,6 @@ const {
   sendResetPasswordEmail,
   sendResetSuccessEmail,
 } = require("../mailtrap/email");
-const { error } = require("console");
 const prisma = new PrismaClient();
 const singUp = async (req, res) => {
   try {
@@ -157,18 +156,17 @@ const logout = async (req, res) => {
   }
 };
 
+
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return res.json({error: "User not found" });
+      return res.json({ error: "User not found" });
     }
 
-    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetToken = jwt.sign({ id: user.id }, process.env.RESET_PASS_TOKEN,);
     const resetTokenExpires = new Date(Date.now() + 1 * 60 * 60 * 1000);
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = resetTokenExpires;
 
     await prisma.user.update({
       where: { id: user.id },
@@ -177,17 +175,19 @@ const forgotPassword = async (req, res) => {
         resetPasswordExpires: resetTokenExpires,
       },
     });
+
     await sendResetPasswordEmail(
       user.email,
       `${process.env.FRONTEND_URL}/reset-password/${resetToken}`
     );
-    res.json({ success: "email sent successfully please check your email" });
+
+    res.json({ success: "Email sent successfully, please check your email" });
   } catch (error) {
     console.log(error);
-
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 const resetPassword = async (req, res) => {
   try {
     const { token } = req.params;
@@ -203,12 +203,9 @@ const resetPassword = async (req, res) => {
     });
 
     if (!user) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid or expired token" });
+      return res.json({ error: "Invalid or expired token" });
     }
 
-    // Hash the new password and update the user
     const hashedPassword = await bcrypt.hash(password, 10);
     await prisma.user.update({
       where: { id: user.id },
@@ -219,14 +216,11 @@ const resetPassword = async (req, res) => {
       },
     });
 
-    // Send success email
     await sendResetSuccessEmail(user.email, user.name);
-    res
-      .status(200)
-      .json({ success: true, message: "Password reset successfully" });
+    res.json({ success: "Password reset successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: error.message });
+    res.json({error: error.message });
   }
 };
 

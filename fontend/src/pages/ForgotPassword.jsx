@@ -89,9 +89,8 @@ const ForgotPassword = () => {
 
       <div className="px-8 py-4 bg-gray-900 bg-opacity-50 flex justify-center">
         <Link
-          to={"/login"}
-          className="text-sm text-green-400 hover:underline flex items-center"
-        >
+          to={"/sing-in"}
+          className="text-sm text-green-400 hover:underline flex items-center">
           <ArrowLeft className="h-4 w-4 mr-2" /> Back to Login
         </Link>
       </div>
